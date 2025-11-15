@@ -2,9 +2,28 @@ import { DiVisualstudio } from "react-icons/di";
 import AppCard from "../ui/AppCard";
 
 import { useLoaderData } from "react-router";
+import { useEffect, useState } from "react";
+import Button from "daisyui/components/button";
 
 const AllAppsPage = () => {
-  const apps = useLoaderData();
+  const [apps, setApps] = useState([]);
+  const [totalApps, setTotalApps] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(2);
+  const limit = 10;
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/apps?${limit}&skip=${currentPage * limit}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setApps(data.apps);
+        setTotalApps(data.total);
+
+        const page = Math.ceil(data.total / limit);
+        setTotalPage(page);
+      });
+  }, []);
+
   return (
     <div>
       <title>All Apps | Hero Apps</title>
@@ -22,7 +41,7 @@ const AllAppsPage = () => {
       <div className="w-11/12 mx-auto flex flex-col-reverse lg:flex-row gap-5 items-start justify-between lg:items-end mt-10">
         <div>
           <h2 className="text-lg underline font-bold">
-            ({apps.length}) Apps Found
+            ({totalApps}) Apps Found
           </h2>
         </div>
 
@@ -78,6 +97,14 @@ const AllAppsPage = () => {
           )}
         </div>
       </>
+
+      <div className="flex gap-3 justify-center py-10">
+        {[...Array(totalPage).keys()].map((i) => (
+          <button key={i} className="btn btn-outline btn-primary">
+            {i + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
