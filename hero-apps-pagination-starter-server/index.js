@@ -63,7 +63,10 @@ app.get("/apps", async (req, res) => {
       .skip(Number(skip))
       .project({ description: 0, rating: 0 })
       .toArray();
-    res.send(apps);
+
+    const count = await appsCollection.countDocuments();
+
+    res.send({ apps, total: count });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
