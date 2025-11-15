@@ -9,11 +9,13 @@ const AllAppsPage = () => {
   const [apps, setApps] = useState([]);
   const [totalApps, setTotalApps] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(2);
-  const limit = 10;
+  const [currentPage, setCurrentPage] = useState(0);
+  const limit = 7;
 
   useEffect(() => {
-    fetch(`http://localhost:5000/apps?${limit}&skip=${currentPage * limit}`)
+    fetch(
+      `http://localhost:5000/apps?limit=${limit}&skip=${currentPage * limit}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setApps(data.apps);
@@ -22,7 +24,7 @@ const AllAppsPage = () => {
         const page = Math.ceil(data.total / limit);
         setTotalPage(page);
       });
-  }, []);
+  }, [currentPage]);
 
   return (
     <div>
@@ -99,11 +101,33 @@ const AllAppsPage = () => {
       </>
 
       <div className="flex gap-3 justify-center py-10">
+        {currentPage > 0 && (
+          <button
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="btn"
+          >
+            Prev
+          </button>
+        )}
+
         {[...Array(totalPage).keys()].map((i) => (
-          <button key={i} className="btn btn-outline btn-primary">
+          <button
+            onClick={() => setCurrentPage(i)}
+            key={i}
+            className={`btn ${i === currentPage && "btn-primary"}`}
+          >
             {i + 1}
           </button>
         ))}
+
+        {currentPage < totalPage - 1 && (
+          <button
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="btn"
+          >
+            Next
+          </button>
+        )}
       </div>
     </div>
   );
